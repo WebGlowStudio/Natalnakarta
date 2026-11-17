@@ -163,7 +163,9 @@
   <section class="card cup-card">
     <h2>Gledanje u šolju</h2>
     <p class="small top center">Popij kafu (bar u mislima ☕), zamisli želju i okreni šolju. Šolja će ti otkriti dva-tri znaka.</p>
-    <div class="cup-box"><div id="cup"></div></div>
+    <div class="cup-tools"><button type="button" class="sound-btn" id="cup-sound" aria-pressed="false" aria-label="Isključi zvuk" title="Zvuk uključen/isključen">🔊 Zvuk</button></div>
+    <div class="cup-box"><div id="cup" class="cup-stage"></div></div>
+    <p class="cup-step" id="cup-step" aria-live="polite">Zamisli želju i okreni šolju na tacnu</p>
     <div class="actions">
       <button type="button" class="btn primary" id="cup-btn">Okreni šolju ☕</button>
       <button type="button" class="btn ghost" id="cup-again" hidden>Ponovo</button>

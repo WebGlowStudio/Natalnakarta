@@ -447,7 +447,7 @@ var crysInit = false, crysAngle = 0, spinning = false;
 function initCrystal() {
   if (crysInit) return; crysInit = true;
   var L = window.NK_CRYSTALS, n = L.length, seg = 360 / n, o = [];
-  o.push('<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Točak kristala"><g class="rot" id="c-rot">');
+  o.push('<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Točak kristala"><g transform="translate(200 200)"><g id="c-rot" class="rot" transform="rotate(0)"><g transform="translate(-200 -200)">');
   L.forEach(function (c, i) {
     var a1 = (i * seg - 90 - seg / 2) * Math.PI / 180, a2 = ((i + 1) * seg - 90 - seg / 2) * Math.PI / 180;
     var x1 = 200 + 190 * Math.cos(a1), y1 = 200 + 190 * Math.sin(a1), x2 = 200 + 190 * Math.cos(a2), y2 = 200 + 190 * Math.sin(a2);
@@ -455,7 +455,7 @@ function initCrystal() {
     var mid = i * seg - 90, light = luminance(c.color) > 0.55, flip = Math.cos(mid * Math.PI / 180) < -0.01;
     o.push('<text transform="rotate(' + (flip ? mid + 180 : mid) + ' 200 200)" x="' + (flip ? 22 : 378) + '" y="200" text-anchor="' + (flip ? 'start' : 'end') + '" dominant-baseline="central" font-family="Jost,sans-serif" font-weight="600" font-size="' + (c.name.length > 11 ? 13 : 14.5) + '" fill="' + (light ? '#1b1650' : '#ffffff') + '">' + esc(c.name) + '</text>');
   });
-  o.push('</g><circle cx="200" cy="200" r="192" fill="none" stroke="#e8c26a" stroke-width="4"/><circle cx="200" cy="200" r="34" fill="#0d0b2b" stroke="#e8c26a" stroke-width="3"/><text x="200" y="201" text-anchor="middle" dominant-baseline="central" font-size="24" fill="#e8c26a">✦</text></svg>');
+  o.push('</g></g></g><circle cx="200" cy="200" r="192" fill="none" stroke="#e8c26a" stroke-width="4"/><circle cx="200" cy="200" r="34" fill="#0d0b2b" stroke="#e8c26a" stroke-width="3"/><text x="200" y="201" text-anchor="middle" dominant-baseline="central" font-size="24" fill="#e8c26a">✦</text></svg>');
   $('c-wheel').innerHTML = o.join('');
   $('c-spin').addEventListener('click', spinCrystal);
 }
@@ -472,9 +472,9 @@ function spinCrystal() {
   $('c-result').hidden = true;
   function step(now) {
     var p = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - p, 4);
-    var a = start + (end - start) * e; g.setAttribute('transform', 'rotate(' + a.toFixed(2) + ' 200 200)');
+    var a = start + (end - start) * e; g.setAttribute('transform', 'rotate(' + a.toFixed(2) + ')');
     if (p < 1) requestAnimationFrame(step);
-    else { crysAngle = C.norm(end); g.setAttribute('transform', 'rotate(' + crysAngle.toFixed(2) + ' 200 200)'); spinning = false; showCrystal(L[idx]); }
+    else { crysAngle = C.norm(end); g.setAttribute('transform', 'rotate(' + crysAngle.toFixed(2) + ')'); spinning = false; showCrystal(L[idx]); }
   }
   requestAnimationFrame(step);
 }
@@ -484,71 +484,146 @@ function showCrystal(c) {
   r.hidden = false; $('c-spin').textContent = 'Zavrti ponovo ✦';
 }
 
-/* ---------- Gledanje u šolju ---------- */
-var cupInit = false;
+/* ---------- Gledanje u šolju (u stilu Šoljice sreće: šolja se okreće na tacnu) ---------- */
+var cupInit = false, cupRun = 0, audioCtx = null;
+var cupMuted = false;
+try { cupMuted = localStorage.getItem('nk-cup-muted') === '1'; } catch (e) {}
 function rnd(a, b) { return a + Math.random() * (b - a); }
-function cupSVG() {
-  var o = ['<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Šolja za kafu">',
-    '<defs><radialGradient id="cupin" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="#fbf4ea"/><stop offset=".8" stop-color="#efe3d2"/><stop offset="1" stop-color="#d9c6ad"/></radialGradient></defs>',
-    '<g class="cupside">',
-    '<ellipse cx="200" cy="318" rx="150" ry="26" fill="#efe6f7" stroke="#e8c26a" stroke-width="3"/><ellipse cx="200" cy="314" rx="95" ry="13" fill="#d9cffb" opacity=".6"/>',
-    '<path d="M95 160 Q100 300 200 306 Q300 300 305 160Z" fill="#fbf7f1" stroke="#e8c26a" stroke-width="3"/>',
-    '<path d="M303 190 q58 -8 52 40 q-6 42 -64 40" fill="none" stroke="#e8c26a" stroke-width="11" stroke-linecap="round"/><path d="M303 190 q58 -8 52 40 q-6 42 -64 40" fill="none" stroke="#fbf7f1" stroke-width="6" stroke-linecap="round"/>',
-    '<ellipse cx="200" cy="160" rx="105" ry="22" fill="#4a2c1d" stroke="#e8c26a" stroke-width="3"/><ellipse cx="185" cy="157" rx="40" ry="6" fill="#7a4a30" opacity=".6"/>',
-    '<path d="M120 215 q80 18 160 0" stroke="#b9a7f0" stroke-width="5" fill="none" opacity=".7"/><circle cx="200" cy="245" r="5" fill="#e8c26a"/><circle cx="170" cy="240" r="3" fill="#e8c26a"/><circle cx="230" cy="240" r="3" fill="#e8c26a"/>',
-    '<path d="M170 120 q-14 -20 0 -40 q14 -20 0 -40" stroke="#d9cffb" stroke-width="3" fill="none" opacity=".5" stroke-linecap="round"/><path d="M210 125 q-14 -20 0 -40 q14 -20 0 -40" stroke="#d9cffb" stroke-width="3" fill="none" opacity=".4" stroke-linecap="round"/>',
-    '</g><g class="inside" id="cup-in"></g></svg>'];
-  return o.join('');
+function reducedMotion() { return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function unlockAudio() {
+  // poziva se samo iz klika korisnika (pravila za automatsko puštanje zvuka)
+  if (cupMuted) return;
+  try {
+    if (!audioCtx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; audioCtx = new AC(); }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (e) { audioCtx = null; }
+}
+function clink(strength) {
+  if (cupMuted || !audioCtx) return;
+  var ac = audioCtx, t = ac.currentTime + 0.01, v = strength || 1;
+  var out = ac.createGain(); out.gain.value = 0.55 * v; out.connect(ac.destination);
+  // kratki „cuk“: udar (filtriran šum)
+  var len = Math.floor(ac.sampleRate * 0.05), buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+  for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+  var n = ac.createBufferSource(); n.buffer = buf;
+  var bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 1.2;
+  var ng = ac.createGain(); ng.gain.value = 0.9;
+  n.connect(bp); bp.connect(ng); ng.connect(out); n.start(t);
+  // keramički zvon: nekoliko neharmonijskih parcijala sa brzim opadanjem
+  [[2350, 0.32, 0.18], [3870, 0.22, 0.12], [5480, 0.14, 0.08], [1240, 0.18, 0.09]].forEach(function (p) {
+    var o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(p[0] * (1 + rnd(-0.01, 0.01)), t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(p[1], t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + p[2]);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + p[2] + 0.05);
+  });
+}
+function setMuted(m) {
+  cupMuted = m; try { localStorage.setItem('nk-cup-muted', m ? '1' : '0'); } catch (e) {}
+  var b = $('cup-sound'); b.setAttribute('aria-pressed', m ? 'true' : 'false');
+  b.textContent = m ? '🔇 Bez zvuka' : '🔊 Zvuk'; b.setAttribute('aria-label', m ? 'Uključi zvuk' : 'Isključi zvuk');
+}
+function cupHTML() {
+  return '' +
+  '<div class="saucer-wrap" id="cup-saucer"><svg viewBox="0 0 320 320" aria-hidden="true">' +
+    '<defs><radialGradient id="sauG" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e3dcef"/></radialGradient>' +
+    '<filter id="sauS" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".5"/></filter></defs>' +
+    '<circle cx="160" cy="160" r="150" fill="url(#sauG)" filter="url(#sauS)"/>' +
+    '<circle cx="160" cy="160" r="146" fill="none" stroke="#e8c26a" stroke-width="3"/>' +
+    '<circle cx="160" cy="160" r="126" fill="none" stroke="#cfc3e6" stroke-width="2"/>' +
+    '<circle cx="160" cy="160" r="114" fill="none" stroke="#e8c26a" stroke-width="1" stroke-dasharray="2 6" opacity=".8"/>' +
+  '</svg></div>' +
+  '<div class="cup-rot" id="cup-rot"><svg viewBox="0 0 320 320" role="img" aria-label="Šolja kafe na tacni, gledano odozgo">' +
+    '<defs><radialGradient id="cupIn" cx="50%" cy="50%" r="55%"><stop offset="0" stop-color="#fbf5ec"/><stop offset=".8" stop-color="#efe3d2"/><stop offset="1" stop-color="#dccbb5"/></radialGradient>' +
+    '<radialGradient id="cofG" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#6b4126"/><stop offset=".6" stop-color="#3e2414"/><stop offset="1" stop-color="#2a170b"/></radialGradient>' +
+    '<radialGradient id="botG" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e6def2"/></radialGradient>' +
+    '<clipPath id="cupClip"><circle cx="160" cy="160" r="94"/></clipPath>' +
+    '<filter id="cupS" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity=".35"/></filter></defs>' +
+    '<g filter="url(#cupS)"><rect x="248" y="138" width="58" height="44" rx="22" fill="none" stroke="#ffffff" stroke-width="14"/>' +
+    '<rect x="248" y="138" width="58" height="44" rx="22" fill="none" stroke="#e8c26a" stroke-width="2" opacity=".7"/>' +
+    '<circle cx="160" cy="160" r="108" fill="#ffffff" stroke="#e8c26a" stroke-width="3"/></g>' +
+    '<circle cx="160" cy="160" r="96" fill="url(#cupIn)"/>' +
+    '<g clip-path="url(#cupClip)"><g class="grounds" id="cup-grounds"></g><g class="syms" id="cup-syms"></g>' +
+    '<g class="coffee"><circle cx="160" cy="160" r="96" fill="url(#cofG)"/><circle cx="160" cy="160" r="88" fill="none" stroke="#b9875a" stroke-opacity=".45" stroke-width="5"/>' +
+    '<circle cx="128" cy="132" r="5" fill="#c99a6b" fill-opacity=".5"/><circle cx="140" cy="122" r="3" fill="#c99a6b" fill-opacity=".5"/><circle cx="196" cy="188" r="4" fill="#c99a6b" fill-opacity=".45"/></g></g>' +
+    '<g class="bottom"><circle cx="160" cy="160" r="108" fill="url(#botG)" stroke="#e8c26a" stroke-width="3"/><circle cx="160" cy="160" r="58" fill="none" stroke="#cfc3e6" stroke-width="6"/><circle cx="160" cy="160" r="50" fill="none" stroke="#e8c26a" stroke-width="1.5" opacity=".8"/></g>' +
+  '</svg></div>';
 }
 function initCup() {
   if (cupInit) return; cupInit = true;
-  $('cup').innerHTML = cupSVG();
-  $('cup-btn').addEventListener('click', tipCup);
+  $('cup').innerHTML = cupHTML();
+  setMuted(cupMuted);
+  $('cup-sound').addEventListener('click', function () { setMuted(!cupMuted); if (!cupMuted) { unlockAudio(); clink(0.6); } });
+  $('cup-btn').addEventListener('click', turnCup);
   $('cup-again').addEventListener('click', resetCup);
 }
 function resetCup() {
-  var c = $('cup'); c.classList.remove('revealed'); c.classList.remove('tipped');
+  cupRun++;
+  var c = $('cup'); c.classList.remove('revealed', 'drunk'); $('cup-rot').classList.remove('flip');
   $('cup-result').hidden = true; $('cup-again').hidden = true; $('cup-btn').hidden = false; $('cup-btn').disabled = false;
+  $('cup-step').textContent = 'Zamisli želju i okreni šolju na tacnu';
 }
-function tipCup() {
-  var K = window.NK_CUP, reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $('cup-btn').disabled = true;
-  // izaberi 2–3 simbola iz različitih oblasti
+function prepareGrounds(pick) {
+  var cx = 160, cy = 160, R = 92;
+  var slots = [0, 1, 2].map(function (k) { var a = (k * 120 + rnd(-25, 25) - 90) * Math.PI / 180, r = rnd(52, 62); return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }).sort(function () { return Math.random() - 0.5; });
+  function nearSlot(x, y) { for (var q = 0; q < pick.length; q++) if (Math.hypot(x - slots[q][0], y - slots[q][1]) < 24) return true; return false; }
+  var o = [];
+  for (var i = 0; i < 230; i++) {
+    var a = rnd(0, Math.PI * 2), r = Math.sqrt(Math.random()) * R, x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
+    if (nearSlot(x, y)) continue;
+    o.push('<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + rnd(0.6, r < 25 ? 4.5 : 2.6).toFixed(1) + '" fill="#4a2c1d" opacity="' + rnd(0.25, 0.85).toFixed(2) + '"/>');
+  }
+  for (var j = 0; j < 12; j++) {
+    var a0 = rnd(0, Math.PI * 2), r0 = rnd(28, 88), x0 = cx + r0 * Math.cos(a0), y0 = cy + r0 * Math.sin(a0);
+    if (nearSlot(x0, y0)) continue;
+    o.push('<path d="M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' q' + rnd(-16, 16).toFixed(1) + ' ' + rnd(-16, 16).toFixed(1) + ' ' + rnd(-26, 26).toFixed(1) + ' ' + rnd(-26, 26).toFixed(1) + '" stroke="#5a3624" stroke-width="' + rnd(1.5, 4).toFixed(1) + '" fill="none" stroke-linecap="round" opacity="' + rnd(0.3, 0.7).toFixed(2) + '"/>');
+  }
+  o.push('<circle cx="160" cy="160" r="20" fill="#3b2216" opacity=".85"/>');
+  $('cup-grounds').innerHTML = o.join('');
+  var sy = [];
+  pick.forEach(function (s, k) {
+    var p = slots[k], rotA = rnd(-30, 30).toFixed(0);
+    sy.push('<g transform="translate(' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ') rotate(' + rotA + ') scale(1.05)" fill="#3b2216" stroke="#3b2216" opacity=".92">' + s.d + '</g>');
+    sy.push('<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="22" fill="none" stroke="#e8c26a" stroke-width="2" stroke-dasharray="5 3"/><circle cx="' + (p[0] + 17).toFixed(1) + '" cy="' + (p[1] - 17).toFixed(1) + '" r="8" fill="#e8c26a"/><text x="' + (p[0] + 17).toFixed(1) + '" y="' + (p[1] - 16.5).toFixed(1) + '" text-anchor="middle" dominant-baseline="central" font-family="Jost,sans-serif" font-weight="600" font-size="10" fill="#1b1650">' + (k + 1) + '</text>');
+  });
+  $('cup-syms').innerHTML = sy.join('');
+}
+function landing() {
+  clink(1);
+  var s = $('cup-saucer'); s.classList.remove('clink'); void s.getBoundingClientRect(); if (!reducedMotion()) s.classList.add('clink');
+}
+function turnCup() {
+  var K = window.NK_CUP, my = ++cupRun, rm = reducedMotion();
+  unlockAudio(); // klik korisnika otključava zvuk
+  $('cup-btn').disabled = true; $('cup-btn').hidden = true;
   var pool = K.symbols.slice().sort(function () { return Math.random() - 0.5; }), pick = [], areas = {};
   var count = Math.random() < 0.5 ? 2 : 3;
   pool.forEach(function (s) { if (pick.length < count && !areas[s.area]) { pick.push(s); areas[s.area] = 1; } });
-  // talog
-  var o = ['<circle cx="200" cy="200" r="175" fill="#fbf7f1" stroke="#e8c26a" stroke-width="4"/><circle cx="200" cy="200" r="160" fill="url(#cupin)"/>'];
-  var slots = [0, 1, 2].map(function (k) { var a = (k * 120 + rnd(-25, 25) - 90) * Math.PI / 180, r = rnd(88, 108); return [200 + r * Math.cos(a), 200 + r * Math.sin(a)]; }).sort(function () { return Math.random() - 0.5; });
-  function nearSlot(x, y) { for (var q = 0; q < pick.length; q++) if (Math.hypot(x - slots[q][0], y - slots[q][1]) < 34) return true; return false; }
-  for (var i = 0; i < 260; i++) {
-    var a = rnd(0, Math.PI * 2), r = Math.sqrt(Math.random()) * 150, x = 200 + r * Math.cos(a), y = 200 + r * Math.sin(a);
-    if (nearSlot(x, y)) continue;
-    o.push('<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + rnd(0.8, r < 40 ? 7 : 4).toFixed(1) + '" fill="#4a2c1d" opacity="' + rnd(0.25, 0.85).toFixed(2) + '"/>');
-  }
-  for (var j = 0; j < 14; j++) {
-    var a0 = rnd(0, Math.PI * 2), r0 = rnd(40, 145), x0 = 200 + r0 * Math.cos(a0), y0 = 200 + r0 * Math.sin(a0);
-    if (nearSlot(x0, y0)) continue;
-    o.push('<path d="M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' q' + rnd(-25, 25).toFixed(1) + ' ' + rnd(-25, 25).toFixed(1) + ' ' + rnd(-40, 40).toFixed(1) + ' ' + rnd(-40, 40).toFixed(1) + '" stroke="#5a3624" stroke-width="' + rnd(2, 6).toFixed(1) + '" fill="none" stroke-linecap="round" opacity="' + rnd(0.3, 0.7).toFixed(2) + '"/>');
-  }
-  o.push('<circle cx="200" cy="200" r="34" fill="#3b2216" opacity=".85"/>');
-  pick.forEach(function (s, k) {
-    var p = slots[k], rotA = rnd(-30, 30).toFixed(0);
-    o.push('<g transform="translate(' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ') rotate(' + rotA + ') scale(1.75)" fill="#3b2216" stroke="#3b2216" opacity=".92">' + s.d + '</g>');
-    o.push('<g class="hl"><circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="36" fill="none" stroke="#e8c26a" stroke-width="2.5" stroke-dasharray="6 4"/><circle cx="' + (p[0] + 28).toFixed(1) + '" cy="' + (p[1] - 28).toFixed(1) + '" r="11" fill="#e8c26a"/><text x="' + (p[0] + 28).toFixed(1) + '" y="' + (p[1] - 27).toFixed(1) + '" text-anchor="middle" dominant-baseline="central" font-family="Jost,sans-serif" font-weight="600" font-size="13" fill="#1b1650">' + (k + 1) + '</text></g>');
-  });
-  $('cup-in').innerHTML = o.join('');
-  var c = $('cup');
-  c.classList.add('tipped');
-  setTimeout(function () {
+  prepareGrounds(pick);
+  var c = $('cup'), rot = $('cup-rot');
+  $('cup-step').textContent = 'Šolja se okreće…';
+  c.classList.add('drunk'); rot.classList.add('flip');
+  wait(rm ? 30 : 1050).then(function () {
+    if (my !== cupRun) return;
+    landing();
+    $('cup-step').textContent = 'Šolja se hladi na tacni…';
+    return wait(rm ? 400 : 2200);
+  }).then(function () {
+    if (my !== cupRun) return;
+    $('cup-step').textContent = 'Podižemo šolju…';
+    rot.classList.remove('flip');
+    return wait(rm ? 30 : 1100);
+  }).then(function () {
+    if (my !== cupRun) return;
+    clink(0.45);
     c.classList.add('revealed');
+    $('cup-step').textContent = 'Evo šta se vidi u šolji ✨';
     var html = '<h3>Šta kaže šolja</h3>' + pick.map(function (s, k) {
       return '<div class="cup-sym"><span class="num">' + (k + 1) + '</span><div><b>' + s.name + '</b> <span class="tag k">' + s.area + '</span><br>' + esc(s.text) + '</div></div>';
     }).join('');
     html += '<ul class="cup-areas">' + Object.keys(K.areas).map(function (ar) { var l = K.areas[ar]; return '<li><b>' + ar + ':</b> ' + l[Math.floor(Math.random() * l.length)] + '</li>'; }).join('') + '</ul>';
-    $('cup-result').innerHTML = html; $('cup-result').hidden = false;
-    $('cup-btn').hidden = true; $('cup-again').hidden = false;
-  }, reduce ? 50 : 1500);
+    $('cup-result').innerHTML = html; $('cup-result').hidden = false; $('cup-again').hidden = false;
+  });
 }
 
 /* ---------- Start ---------- */

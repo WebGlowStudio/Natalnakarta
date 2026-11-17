@@ -114,7 +114,6 @@ details.how summary{cursor:pointer;color:var(--lav2)}
 .crystal-card{text-align:center}
 .wheel-box{position:relative;max-width:420px;margin:0 auto}
 #c-wheel svg{width:100%;height:auto;display:block;filter:drop-shadow(0 10px 30px rgba(0,0,0,.35))}
-#c-wheel .rot{transform-origin:200px 200px;transform-box:view-box}
 .pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:30px solid var(--gold);z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
 .c-result{max-width:560px;margin:1.4rem auto 0;padding:1.2rem;border:1px solid var(--gold);border-radius:18px;background:rgba(13,11,43,.55);animation:fadein .6s ease}
 .c-result h3{margin-bottom:.4rem}
@@ -123,15 +122,26 @@ details.how summary{cursor:pointer;color:var(--lav2)}
 @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.c-result{animation:none}}
 .cup-card{text-align:center}
-.cup-box{max-width:380px;margin:0 auto}
-#cup svg{width:100%;height:auto;display:block}
-#cup .cupside{transform-origin:200px 250px;transform-box:view-box;transition:transform 1.3s cubic-bezier(.45,.05,.3,1),opacity .5s ease 1.1s}
-#cup.tipped .cupside{transform:rotate(-165deg) translateY(10px);opacity:0}
-#cup .inside{opacity:0;transition:opacity .7s ease}
-#cup.revealed .inside{opacity:1}
-#cup .hl{opacity:0;transition:opacity .6s ease}
-#cup.revealed .hl{opacity:1;transition-delay:.6s}
-@media (prefers-reduced-motion:reduce){#cup .cupside,#cup .inside,#cup .hl{transition:none!important}}
+.cup-box{max-width:340px;margin:0 auto}
+.cup-stage{position:relative;width:100%;aspect-ratio:1}
+.cup-stage svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.saucer-wrap{position:absolute;inset:0}
+.saucer-wrap.clink{animation:saucer .35s ease-out}
+@keyframes saucer{0%{transform:translateY(0)}30%{transform:translateY(4px) scale(.99)}60%{transform:translateY(-1px)}100%{transform:none}}
+.cup-rot{position:absolute;inset:0;transform-origin:50% 50%;transition:transform 1.1s cubic-bezier(.6,-0.2,.3,1.2)}
+.cup-rot.flip{transform:rotate(200deg) scale(.82)}
+.cup-rot .bottom{opacity:0;transition:opacity .25s ease .45s}
+.cup-rot.flip .bottom{opacity:1}
+.cup-stage .coffee{transition:opacity .3s ease .4s}
+.cup-stage.drunk .coffee{opacity:0}
+.cup-stage .grounds,.cup-stage .syms{opacity:0;transition:opacity 1s ease}
+.cup-stage.revealed .grounds{opacity:1}
+.cup-stage.revealed .syms{opacity:1;transition-delay:.4s}
+.cup-step{font-family:'Playfair Display',Georgia,serif;font-style:normal;color:var(--gold2);font-size:1.15rem;min-height:1.6em;margin:.8rem 0 0}
+.cup-tools{display:flex;justify-content:flex-end;max-width:340px;margin:0 auto .3rem}
+.sound-btn{font:inherit;font-size:.85rem;color:var(--lav2);background:rgba(13,11,43,.55);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;cursor:pointer;min-height:36px}
+.sound-btn[aria-pressed="true"]{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.cup-rot,.cup-rot .bottom,.cup-stage .coffee,.cup-stage .grounds,.cup-stage .syms{transition:none!important}.saucer-wrap.clink{animation:none}}
 .c-result.left{text-align:left}
 .cup-sym{display:flex;gap:.8rem;align-items:flex-start;margin:.7rem 0}
 .cup-sym .num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#1b1650;font-weight:600;display:grid;place-items:center}
