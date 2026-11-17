@@ -1,1 +1,192 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Natalna karta, uporedni horoskop, kristali i šolja – besplatno | WebGlow Studio</title>
+<meta name="description" content="Besplatna natalna karta sa preciznim proračunom i tumačenjem na srpskom, uporedni horoskop (sinastrija) za dve osobe, točak kristala i gledanje u šolju za zabavu.">
+<meta name="keywords" content="natalna karta, uporedni horoskop, sinastrija, kristali, gledanje u šolju, podznak, astrologija, horoskop, natalna karta besplatno">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://webglowstudio.github.io/Natalnakarta/">
+<meta name="theme-color" content="#0d0b2b">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sr_RS">
+<meta property="og:title" content="Natalna karta, uporedni horoskop, kristali i šolja – besplatno">
+<meta property="og:description" content="Precizna natalna karta sa tumačenjem, uporedni horoskop za dvoje, kristal za tebe i gledanje u šolju. Na srpskom, besplatno.">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:title" content="Natalna karta, uporedni horoskop, kristali i šolja">
+<meta name="twitter:description" content="Precizna natalna karta sa tumačenjem, uporedni horoskop, kristal za tebe i gledanje u šolju – besplatno.">
+<meta name="twitter:image" content="https://webglowstudio.github.io/Natalnakarta/og-image.png">
+<meta property="og:url" content="https://webglowstudio.github.io/Natalnakarta/">
+<meta property="og:image" content="https://webglowstudio.github.io/Natalnakarta/og-image.png">
+<meta property="og:site_name" content="Natalna karta">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Natalna karta","url":"https://webglowstudio.github.io/Natalnakarta/","inLanguage":"sr","applicationCategory":"LifestyleApplication","keywords":"natalna karta, uporedni horoskop, sinastrija, kristali, gledanje u šolju","operatingSystem":"Any (web browser)","description":"Besplatan kalkulator natalne karte i uporednog horoskopa (sinastrije), točak kristala i gledanje u šolju za zabavu sa preciznim položajima planeta, podznakom, kućama, aspektima i tumačenjem na srpskom.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"creator":{"@type":"Organization","name":"WebGlow Studio","url":"https://webglowstudio.github.io/Webglowstudioportfolio/"}}
+</script>
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+<header class="hero">
+  <p class="eyebrow">✦ besplatno · precizno · na srpskom ✦</p>
+  <h1>Tvoja natalna karta</h1>
+  <p class="lead">Mapa neba u trenutku tvog rođenja. Unesi podatke i za par sekundi dobij kartu, položaje planeta, aspekte i kratko tumačenje. Ili uporedi dve karte i proveri slaganje.</p>
+</header>
 
+<main>
+  <nav class="tabs" role="tablist" aria-label="Izbor alata">
+    <button type="button" role="tab" id="tab-btn-natal" aria-controls="tab-natal" aria-selected="true" class="tab active">Natalna karta</button>
+    <button type="button" role="tab" id="tab-btn-syn" aria-controls="tab-syn" aria-selected="false" class="tab">Uporedni horoskop</button>
+    <button type="button" role="tab" id="tab-btn-kristal" aria-controls="tab-kristal" aria-selected="false" class="tab">Kristal za tebe</button>
+    <button type="button" role="tab" id="tab-btn-solja" aria-controls="tab-solja" aria-selected="false" class="tab">Gledanje u šolju</button>
+  </nav>
+
+  <div id="tab-natal" role="tabpanel" aria-labelledby="tab-btn-natal">
+  <section class="card form-card" aria-labelledby="f-title">
+    <h2 id="f-title">Podaci o rođenju</h2>
+    <form id="nk-form" autocomplete="off" novalidate>
+      <div class="person" data-p="n"></div>
+      <p class="error" id="n-error" role="alert" hidden></p>
+      <button type="submit" class="btn primary">Izračunaj kartu ✦</button>
+    </form>
+  </section>
+
+  <section id="result" class="result" aria-live="polite">
+    <div class="card chart-card">
+      <p class="badge" id="n-badge">Primer karte – unesi svoje podatke iznad</p>
+      <h2 id="n-title">Natalna karta</h2>
+      <p class="meta" id="n-meta"></p>
+      <p class="note warn" id="n-warn" hidden></p>
+      <div class="wheel-wrap"><div id="n-wheel"></div></div>
+      <div class="actions">
+        <button type="button" class="btn" data-png="n">Preuzmi PNG</button>
+        <button type="button" class="btn" data-print>Sačuvaj kao PDF / štampaj</button>
+        <button type="button" class="btn ghost" data-link="n">Kopiraj link karte</button>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:#e8c26a"></i>konjunkcija</span><span><i style="background:#f08080"></i>opozicija</span>
+        <span><i style="background:#ff9f7a"></i>kvadrat</span><span><i style="background:#7fd1ff"></i>trigon</span><span><i style="background:#9be7b0"></i>sekstil</span>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <h3>Položaji planeta</h3>
+        <div class="table-wrap"><table class="tbl" id="n-planets"><thead><tr><th>Planeta</th><th>Znak</th><th>Stepen</th><th>Kuća</th></tr></thead><tbody></tbody></table></div>
+        <p class="small" id="n-hnote"></p>
+      </div>
+      <div class="card">
+        <h3>Elementi i kvaliteti</h3>
+        <div id="n-balance"></div>
+        <h3 class="mt">Glavni aspekti</h3>
+        <ul class="aspects" id="n-aspects"></ul>
+      </div>
+    </div>
+    <div class="card interp">
+      <h3>Tumačenje</h3>
+      <div id="n-interp"></div>
+      <p class="note">✦ Ovo je automatski pregled tvoje natalne karte, napisan da bude inspiracija, a ne konačna sudbina. Detaljno, lično tumačenje radi astrolog, koji sagledava celu kartu i njene međusobne veze.</p>
+    </div>
+  </section>
+  </div>
+
+  <div id="tab-syn" role="tabpanel" aria-labelledby="tab-btn-syn" hidden>
+  <section class="card form-card" aria-labelledby="s-ftitle">
+    <h2 id="s-ftitle">Uporedni horoskop (sinastrija)</h2>
+    <p class="small top">Uporedi dve natalne karte i pogledaj kako se vaše planete dodiruju: gde teče lako, a gde rastete zajedno.</p>
+    <form id="s-form" autocomplete="off" novalidate>
+      <div class="pair">
+        <fieldset class="pf"><legend>Osoba A</legend><div class="person" data-p="a"></div></fieldset>
+        <fieldset class="pf"><legend>Osoba B</legend><div class="person" data-p="b"></div></fieldset>
+      </div>
+      <p class="error" id="s-error" role="alert" hidden></p>
+      <button type="submit" class="btn primary">Uporedi karte ♡</button>
+    </form>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="card chart-card">
+      <p class="badge" id="s-badge">Primer para – unesi svoje podatke iznad</p>
+      <h2 id="s-title">Uporedni horoskop</h2>
+      <p class="meta" id="s-meta"></p>
+      <p class="note warn" id="s-warn" hidden></p>
+      <div class="wheel-wrap"><div id="s-wheel"></div></div>
+      <p class="small center">Unutrašnji krug: <b class="ga">osoba A</b> (planete i kuće) · spoljašnji prsten: <b class="gb">osoba B</b> · linije u sredini: aspekti između vas</p>
+      <div class="actions">
+        <button type="button" class="btn" data-png="s">Preuzmi PNG</button>
+        <button type="button" class="btn" data-print>Sačuvaj kao PDF / štampaj</button>
+        <button type="button" class="btn ghost" data-link="s">Kopiraj link poređenja</button>
+      </div>
+    </div>
+    <div class="card score-card">
+      <h3>Slaganje</h3>
+      <div id="s-score"></div>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <h3>Aspekti između karata</h3>
+        <div class="table-wrap"><table class="tbl" id="s-aspects"><thead><tr><th class="ga">A</th><th>Aspekt</th><th class="gb">B</th><th>Orb</th></tr></thead><tbody></tbody></table></div>
+      </div>
+      <div class="card">
+        <h3>Položaji</h3>
+        <div class="table-wrap"><table class="tbl" id="s-planets"><thead><tr><th>Planeta</th><th class="ga">A</th><th class="gb">B</th></tr></thead><tbody></tbody></table></div>
+        <h3 class="mt">Elementi</h3>
+        <div id="s-elements"></div>
+      </div>
+    </div>
+    <div class="card interp">
+      <h3>Tumačenje odnosa</h3>
+      <div id="s-interp"></div>
+      <p class="note">✦ Ovo je automatski, razigran pregled odnosa dve karte. Nijedna kombinacija nije „loša“ – svaki odnos gradi se razumevanjem i trudom. Detaljnu sinastriju radi astrolog.</p>
+    </div>
+  </section>
+  </div>
+  <div id="tab-kristal" role="tabpanel" aria-labelledby="tab-btn-kristal" hidden>
+  <section class="card crystal-card">
+    <h2>Kristal za tebe</h2>
+    <p class="small top center">Zatvori oči na trenutak, pomisli na ono što ti je danas potrebno i zavrti točak ✦</p>
+    <div class="wheel-box">
+      <div class="pointer" aria-hidden="true"></div>
+      <div id="c-wheel"></div>
+    </div>
+    <div class="actions"><button type="button" class="btn primary" id="c-spin">Zavrti točak ✦</button></div>
+    <div id="c-result" class="c-result" aria-live="polite" hidden></div>
+  </section>
+  </div>
+  <div id="tab-solja" role="tabpanel" aria-labelledby="tab-btn-solja" hidden>
+  <section class="card cup-card">
+    <h2>Gledanje u šolju</h2>
+    <p class="small top center">Popij kafu (bar u mislima ☕), zamisli želju i okreni šolju. Šolja će ti otkriti dva-tri znaka.</p>
+    <div class="cup-box"><div id="cup"></div></div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="cup-btn">Okreni šolju ☕</button>
+      <button type="button" class="btn ghost" id="cup-again" hidden>Ponovo</button>
+    </div>
+    <div id="cup-result" class="c-result left" aria-live="polite" hidden></div>
+    <p class="note center-note">☕ Samo za zabavu – šolja ne određuje sudbinu, ali lepa misao može da ulepša dan.</p>
+  </section>
+  </div>
+</main>
+<datalist id="nk-cities"></datalist>
+
+<footer class="footer">
+  <p>Proračun: astronomija visoke preciznosti (astronomy-engine), tropski zodijak, Placidus kuće, pravi Mesečev čvor.</p>
+  <p>Napravio: <a href="https://webglowstudio.github.io/Webglowstudioportfolio/" target="_blank" rel="noopener">WebGlow Studio</a></p>
+</footer>
+
+<script src="js/astronomy.min.js"></script>
+<script src="js/astro-core.js"></script>
+<script src="js/cities.js"></script>
+<script src="js/texts.js"></script>
+<script src="js/texts-syn.js"></script>
+<script src="js/crystals.js"></script>
+<script src="js/cup.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
