@@ -447,17 +447,25 @@ var crysInit = false, crysAngle = 0, spinning = false;
 function initCrystal() {
   if (crysInit) return; crysInit = true;
   var L = window.NK_CRYSTALS, n = L.length, seg = 360 / n, o = [];
-  o.push('<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Točak kristala"><g transform="translate(200 200)"><g id="c-rot" class="rot" transform="rotate(0)"><g transform="translate(-200 -200)">');
+  // Statičan SVG sa segmentima (centar 200,200). Vrti se samo HTML omotač (div), nikad SVG čvor.
+  o.push('<div class="c-rotor" id="c-rot"><svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Točak kristala">');
   L.forEach(function (c, i) {
     var a1 = (i * seg - 90 - seg / 2) * Math.PI / 180, a2 = ((i + 1) * seg - 90 - seg / 2) * Math.PI / 180;
     var x1 = 200 + 190 * Math.cos(a1), y1 = 200 + 190 * Math.sin(a1), x2 = 200 + 190 * Math.cos(a2), y2 = 200 + 190 * Math.sin(a2);
-    o.push('<path d="M200 200 L' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' A190 190 0 0 1 ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + 'Z" fill="' + c.color + '" stroke="#0d0b2b" stroke-width="1.5"/>');
+    o.push('<path d="M200 200 L' + x1.toFixed(2) + ' ' + y1.toFixed(2) + ' A190 190 0 0 1 ' + x2.toFixed(2) + ' ' + y2.toFixed(2) + 'Z" fill="' + c.color + '" stroke="#0d0b2b" stroke-width="1.5"/>');
     var mid = i * seg - 90, light = luminance(c.color) > 0.55, flip = Math.cos(mid * Math.PI / 180) < -0.01;
     o.push('<text transform="rotate(' + (flip ? mid + 180 : mid) + ' 200 200)" x="' + (flip ? 22 : 378) + '" y="200" text-anchor="' + (flip ? 'start' : 'end') + '" dominant-baseline="central" font-family="Jost,sans-serif" font-weight="600" font-size="' + (c.name.length > 11 ? 13 : 14.5) + '" fill="' + (light ? '#1b1650' : '#ffffff') + '">' + esc(c.name) + '</text>');
   });
-  o.push('</g></g></g><circle cx="200" cy="200" r="192" fill="none" stroke="#e8c26a" stroke-width="4"/><circle cx="200" cy="200" r="34" fill="#0d0b2b" stroke="#e8c26a" stroke-width="3"/><text x="200" y="201" text-anchor="middle" dominant-baseline="central" font-size="24" fill="#e8c26a">✦</text></svg>');
+  o.push('</svg></div>');
+  // Prsten i centar: poseban SVG preko točka, ne rotira se
+  o.push('<svg class="c-ring" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="200" cy="200" r="192" fill="none" stroke="#e8c26a" stroke-width="4"/><circle cx="200" cy="200" r="34" fill="#0d0b2b" stroke="#e8c26a" stroke-width="3"/><text x="200" y="201" text-anchor="middle" dominant-baseline="central" font-size="24" fill="#e8c26a">✦</text></svg>');
   $('c-wheel').innerHTML = o.join('');
+  setRotor(crysAngle);
   $('c-spin').addEventListener('click', spinCrystal);
+}
+function setRotor(a) {
+  var el = $('c-rot'), v = 'rotate(' + a.toFixed(2) + 'deg)';
+  el.style.webkitTransform = v; el.style.transform = v; el.setAttribute('data-angle', a.toFixed(2));
 }
 function luminance(hex) { var r = parseInt(hex.substr(1, 2), 16) / 255, g = parseInt(hex.substr(3, 2), 16) / 255, b = parseInt(hex.substr(5, 2), 16) / 255; return 0.299 * r + 0.587 * g + 0.114 * b; }
 function spinCrystal() {
@@ -468,13 +476,13 @@ function spinCrystal() {
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var start = crysAngle, end = target - 360 * (reduce ? 0 : 6);
   while (end > start - (reduce ? 0 : 360 * 5)) end -= 360;
-  var dur = reduce ? 0 : 4200, t0 = performance.now(), g = $('c-rot');
+  var dur = reduce ? 0 : 4200, t0 = performance.now();
   $('c-result').hidden = true;
   function step(now) {
     var p = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - p, 4);
-    var a = start + (end - start) * e; g.setAttribute('transform', 'rotate(' + a.toFixed(2) + ')');
+    setRotor(start + (end - start) * e);
     if (p < 1) requestAnimationFrame(step);
-    else { crysAngle = C.norm(end); g.setAttribute('transform', 'rotate(' + crysAngle.toFixed(2) + ')'); spinning = false; showCrystal(L[idx]); }
+    else { crysAngle = C.norm(end); setRotor(crysAngle); spinning = false; showCrystal(L[idx]); }
   }
   requestAnimationFrame(step);
 }
